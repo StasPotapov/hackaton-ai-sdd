@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Claude Code / локальный тулинг
+.claude/
+.memsearch/
+
+# BMad — установленный фреймворк и его выводы
+_bmad/
+_bmad-output/

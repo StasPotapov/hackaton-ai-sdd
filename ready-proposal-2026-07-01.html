@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ready — гейт готовности как скилл Ouroboros</title>
+<style>
+  :root{
+    --bg:#0a0b0f; --surface:#14161f; --surface2:#1c1f2b;
+    --text:#eceef3; --muted:#878b99; --line:#2a2e3c;
+    --amber:#f5b942; --green:#4ade80; --danger:#f4604f; --blue:#6aa8ff;
+    --mono:'SF Mono',ui-monospace,'JetBrains Mono','Menlo',monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#000;color:var(--text);font-family:var(--sans);overflow:hidden}
+  #deck{position:relative;height:100vh;width:100vw}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:7vh 9vw;background:transparent;z-index:1;animation:fade .55s cubic-bezier(.2,.7,.2,1)}
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:.85rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:1.6rem}
+  .kicker .dot{color:var(--amber)}
+  h1{font-size:clamp(2.4rem,6vw,5rem);font-weight:800;line-height:1.02;letter-spacing:-.02em}
+  h2{font-size:clamp(1.8rem,4.2vw,3.4rem);font-weight:750;line-height:1.08;letter-spacing:-.015em}
+  .lead{font-size:clamp(1.1rem,2vw,1.6rem);color:var(--muted);line-height:1.5;max-width:56ch;margin-top:1.4rem}
+  .amber{color:var(--amber)} .green{color:var(--green)} .danger{color:var(--danger)} .blue{color:var(--blue)} .text{color:var(--text)} .muted{color:var(--muted)}
+  .mono{font-family:var(--mono)}
+  #bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--amber),var(--green));z-index:50;transition:width .4s ease}
+  #counter{position:fixed;bottom:22px;right:30px;font-family:var(--mono);font-size:.78rem;color:var(--muted);z-index:50}
+  #hint{position:fixed;bottom:22px;left:30px;font-family:var(--mono);font-size:.72rem;color:#4a4e5c;z-index:50}
+  /* title */
+  .title-wrap{display:flex;flex-direction:column;gap:.4rem}
+  .title-sub{font-size:clamp(1rem,1.7vw,1.4rem);color:var(--muted);margin-top:2rem;font-family:var(--mono)}
+  .badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.8rem;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:.4rem .9rem;width:fit-content}
+  /* tabs (chaos) */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;max-width:64ch;margin-top:.5rem}
+  .tab{font-family:var(--mono);font-size:.72rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-top-color:#3a3030;border-radius:7px 7px 0 0;padding:.35rem .7rem;opacity:0;animation:rise .4s forwards}
+  /* big glitch word */
+  .enemy{font-size:clamp(3rem,11vw,9rem);font-weight:850;letter-spacing:-.03em;color:var(--danger);line-height:.95;animation:enemyglitch 2s infinite}
+  @keyframes enemyglitch{0%,88%,100%{text-shadow:none;transform:none}90%{text-shadow:-3px 0 #06b6d4,3px 0 #f4604f;transform:translateX(2px) skewX(-1deg)}94%{text-shadow:3px 0 #06b6d4,-3px 0 #f4604f;transform:translateX(-2px)}97%{text-shadow:-2px 0 #06b6d4,2px 0 #f4604f;transform:none}}
+  /* cards row */
+  .cards{display:flex;gap:1.1rem;flex-wrap:wrap;margin-top:2.4rem}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.5rem;min-width:160px;opacity:0;animation:rise .5s forwards}
+  .card .ic{font-size:2rem}
+  .card .nm{font-weight:700;margin-top:.5rem;font-size:1.1rem}
+  .card .rl{color:var(--muted);font-size:.85rem;margin-top:.15rem}
+  /* metric card (AS IS → TO BE) */
+  .card .metric{font-weight:700;font-size:1.02rem;margin-top:.5rem}
+  .card .move{margin-top:.55rem;font-family:var(--mono);font-size:.92rem}
+  .card .move .from{color:var(--muted)}
+  .card .move .to{color:var(--green);font-weight:700}
+  .card .move .ar{color:var(--amber);padding:0 .35rem}
+  .quote{margin-top:2.4rem;border-left:3px solid var(--amber);padding:.5rem 0 .5rem 1.3rem;max-width:64ch;font-size:clamp(1.05rem,1.8vw,1.4rem)}
+  .quote b{color:var(--amber)}
+  /* chain (sequential reveal + count) */
+  .chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:2.6rem;font-family:var(--mono)}
+  .node{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1.3rem;display:flex;flex-direction:column;gap:.3rem;min-width:116px;max-width:210px}
+  .node .big{font-size:1.7rem;font-weight:800;color:var(--amber)}
+  .node .lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;line-height:1.3}
+  .arrow{display:flex;align-items:center;color:var(--line);font-size:1.6rem;padding:0 .7rem}
+  .chain.seq .node{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .chain.seq .node.show{opacity:1;transform:none}
+  .chain.seq .arrow{opacity:.18;color:var(--line);transition:opacity .5s ease,color .5s ease,text-shadow .5s ease}
+  .chain.seq .arrow.show{opacity:1;color:var(--amber);text-shadow:0 0 16px rgba(245,185,66,.85)}
+  /* cascade list ("wall") */
+  .clist{font-family:var(--mono);font-size:clamp(.6rem,1.15vw,.92rem);line-height:1.55;background:#070809;border:1px solid var(--line);border-radius:12px;padding:1.4rem 1.6rem;margin-top:1.4rem;max-height:62vh;overflow:hidden;column-count:2;column-gap:2.4rem}
+  .clist .h{color:#5a6cf5}.clist .s{color:var(--green)}.clist .t{color:var(--muted)}
+  .clist.cascade > div{opacity:0}
+  @keyframes gitin{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+  /* stat strip */
+  .stats{display:flex;gap:2.5rem;flex-wrap:wrap;margin-top:2.2rem}
+  .stat .n{font-size:clamp(2rem,4.5vw,3.6rem);font-weight:850;color:var(--green)}
+  .stat .l{color:var(--muted);font-size:.9rem;margin-top:.2rem}
+  /* terminal (static) */
+  .term{font-family:var(--mono);background:#070809;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:2rem;max-width:74ch}
+  .term .top{background:var(--surface);padding:.6rem 1rem;display:flex;gap:.5rem;border-bottom:1px solid var(--line);align-items:center}
+  .term .top i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .term .top .ttl{margin-left:.6rem;color:var(--muted);font-size:.78rem}
+  .term .body{padding:1.4rem 1.6rem;font-size:clamp(.8rem,1.4vw,1.05rem);line-height:1.9}
+  .term .cmd{color:var(--text)} .term .pr{color:var(--green)} .term .ok{color:var(--green)} .term .step{color:var(--muted)} .term .bad{color:var(--danger)} .term .bot{color:var(--amber)}
+  .cursor{display:inline-block;width:9px;height:1.1em;background:var(--green);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  /* animated pipeline */
+  .pipehead{display:flex;align-items:center;gap:.8rem;font-family:var(--mono);font-size:.85rem;margin-top:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+  .pipehead .lbl{color:var(--muted);letter-spacing:.15em}
+  .pipehead .cnt{color:var(--amber);font-weight:700}
+  .pipehead .cnt .ok{color:var(--green)}
+  .dots{display:flex;gap:5px}
+  .sdot{width:18px;height:6px;border-radius:3px;background:var(--line);display:inline-block;transition:background .3s}
+  .sdot.full{background:var(--green)}
+  .pipeline{display:flex;align-items:stretch;gap:0;margin-top:.3rem;font-family:var(--mono);flex-wrap:wrap}
+  .pstage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;min-width:118px;transition:opacity .3s,border-color .3s,box-shadow .3s;opacity:.4}
+  .pstage.on{opacity:1;border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 0 26px -8px var(--amber)}
+  .pstage.guard.on{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 26px -8px var(--green)}
+  .pstage.done{opacity:.92;border-color:#2f6b43}
+  .pstage .pic{font-size:1.3rem}
+  .pstage .pname{font-weight:700;margin-top:.35rem;font-size:.92rem}
+  .pstage .pdesc{color:var(--muted);font-size:.68rem;margin-top:.15rem;line-height:1.3}
+  .pstage .pstate{font-size:.72rem;margin-top:.5rem;min-height:1.15em}
+  .pstate .mut{color:var(--muted)}.pstate .warn{color:var(--amber)}.pstate .ok{color:var(--green)}
+  .parrow{display:flex;align-items:center;color:var(--line);padding:0 .4rem;font-size:1.2rem}
+  .feed{font-family:var(--mono);font-size:.8rem;margin-top:1rem;min-height:2em;line-height:1.75;color:var(--muted)}
+  .feed .ok{color:var(--green)}
+  /* typed line + glow */
+  .typed{font-family:var(--mono);font-size:clamp(1.3rem,3.4vw,2.6rem);font-weight:700;color:var(--bg);background:var(--amber);border-radius:14px;padding:1.1rem 1.8rem;width:fit-content;margin-top:2.2rem;animation:typedglow 2.6s ease-in-out infinite}
+  .typed.term-prompt::before{content:'$ ';opacity:.5}
+  @keyframes typedglow{0%,100%{box-shadow:0 18px 50px -18px rgba(245,185,66,.6)}50%{box-shadow:0 18px 70px -10px rgba(245,185,66,.95)}}
+  .tcur{display:inline-block;color:var(--bg);font-weight:800;animation:blink 1s steps(1) infinite}
+  .closer{font-size:clamp(1.3rem,2.6vw,2rem);font-style:italic;color:var(--text);margin-top:2.4rem;max-width:46ch;line-height:1.4}
+  /* ambient aurora (global) */
+  .aurora{position:fixed;inset:-20%;z-index:0;pointer-events:none;filter:blur(85px);opacity:.4}
+  .aurora span{position:absolute;width:46vw;height:46vw;border-radius:50%;mix-blend-mode:screen;animation:drift 26s ease-in-out infinite}
+  .aurora .a1{background:#b8862e;top:-8%;left:-6%}
+  .aurora .a2{background:#1f6d45;bottom:-18%;right:-4%;animation-delay:-9s}
+  .aurora .a3{background:#26407a;top:28%;right:22%;animation-delay:-17s}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(8%,10%) scale(1.2)}66%{transform:translate(-7%,-8%) scale(.85)}}
+  /* speaker notes */
+  #notes{position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;background:rgba(8,9,14,.97);border-top:2px solid var(--amber);padding:1.6rem 9vw;font-size:1rem;line-height:1.6;color:#d4d7e0;transform:translateY(101%);transition:transform .35s ease;z-index:60;backdrop-filter:blur(6px)}
+  #notes.show{transform:none}
+  #notes .ttl{font-family:var(--mono);font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:.7rem}
+  #notes p{margin:.5rem 0;max-width:80ch}
+  #notes .pause{color:var(--muted);font-style:italic}
+  @media (max-width:760px){.clist{column-count:1}.chain{gap:.4rem}}
+</style>
+</head>
+<body>
+<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+<div id="bar"></div>
+<div id="deck">
+
+  <!-- 1 · ТИТУЛ -->
+  <section class="slide active" data-notes="[пауза 3–4 сек, дай прочитать] Меня зовут … Мы принесли не ещё один генератор документов. Мы принесли скилл, который добывает ваш процесс из ваших же задач — и дальше сам живёт внутри него. [в зал] Наш девиз — вот эта строчка снизу.">
+    <div class="title-wrap">
+      <div class="badge mono">● Sber AI Hack · Ouroboros · Project Proposal</div>
+      <h1 style="margin-top:1.8rem">Ready<br><span class="amber">гейт готовности как скилл</span></h1>
+      <div class="title-sub">«Покажи мне 5 своих задач — и я покажу тебе твой процесс.»</div>
+    </div>
+  </section>
+
+  <!-- 2 · ПРОБЛЕМА (кейс: зачем) -->
+  <section class="slide" data-notes="Все хотят SDD. [в зал] У кого в компании есть регламент процесса на 40 страниц? А кто его дочитал? Вот. Задачи прилетают вот такими — сырыми, «горит», «глянь». [показать на хаос] Узнаёте?">
+    <div class="kicker"><span class="dot">●</span> акт I · проблема</div>
+    <h2>Все хотят SDD.<br><span class="amber">Никто не знает как.</span></h2>
+    <div class="tabs" id="tabs"></div>
+    <p class="lead">Регламент на 40 страниц никто не читает. Внедрение буксует на «давайте сначала договоримся о процессе». А задачи всё равно уходят в работу сырыми — и всплывает вечное «а что ты имел в виду?»: возвраты, переделки, потерянные недели.</p>
+    <div class="enemy" style="font-size:clamp(2rem,6.5vw,4.6rem);margin-top:1.4rem">НЕПОНЯТНО</div>
+  </section>
+
+  <!-- 3 · ИДЕЯ (что) -->
+  <section class="slide" data-notes="Наш ход простой и, кажется, никем не занятый. Процесс не описываем — добываем из примеров. Скилл живёт как пять глаголов: добывает стандарт из 5 задач, применяет его как гейт, охраняет очередь, учит новичков и — эволюционирует. Один источник правды — markdown, который команда правит руками. И один движок работает для всех ролей: аналитик, продакт, дизайнер, разработчик — меняется только чек-лист «что значит готово».">
+    <div class="kicker"><span class="dot">●</span> поворот · идея</div>
+    <h2>Процесс не описываем — <span class="amber">добываем.</span></h2>
+    <div class="cards">
+      <div class="card" style="animation-delay:.04s"><div class="ic">⛏️</div><div class="nm">Добывает</div><div class="rl">стандарт из 5 задач</div></div>
+      <div class="card" style="animation-delay:.15s"><div class="ic">🎯</div><div class="nm">Применяет</div><div class="rl">гейт готовности</div></div>
+      <div class="card" style="animation-delay:.26s"><div class="ic">🛡️</div><div class="nm">Охраняет</div><div class="rl">очередь Jira</div></div>
+      <div class="card" style="animation-delay:.37s"><div class="ic">🎓</div><div class="nm">Учит</div><div class="rl">онбординг по примерам</div></div>
+      <div class="card" style="animation-delay:.48s"><div class="ic">🔄</div><div class="nm">Эволюционирует</div><div class="rl">улучшает процесс</div></div>
+    </div>
+    <div class="quote"><b>Один источник правды — .md, один движок — все роли.</b> Аналитик, продакт, дизайнер, разработчик: меняется только чек-лист «что значит готово». Новая команда = её 5 задач → её стандарт, без кода.</div>
+  </section>
+
+  <!-- 4 · КАЛИБРОВКА + ИНТЕРВЬЮ (достаёт ваш процесс) -->
+  <section class="slide" data-notes="А как он узнаёт именно ваш процесс? Он не с нуля — у него заложена база: каким должен быть хороший процесс, что в задаче обязано быть. Он смотрит ваши 5 лучших задач и накладывает на эту базу. А где контекста мало или чего-то не хватает — не гадает, а доспрашивает: задаёт вам вопросы, иногда пару, иногда больше. По сути он проводит с вами интервью и вытягивает ваш процесс. На выходе — готовый чек-лист и шаблоны команды в markdown, которые вы правите руками. Настройка — это правка .md, без кода и UI.">
+    <div class="kicker"><span class="dot">●</span> калибровка · достаёт ваш процесс</div>
+    <h2>Не приносим процесс — <span class="amber">достаём ваш.</span></h2>
+    <div class="chain">
+      <div class="node"><span class="big">📚</span><span class="lbl">база: каким должен быть процесс</span></div>
+      <div class="arrow">+</div>
+      <div class="node"><span class="big">🗂️</span><span class="lbl">ваши 5 задач</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big">❓</span><span class="lbl">интервью: доспрашивает пробелы</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big green">📋</span><span class="lbl">ваш чек-лист + шаблоны .md</span></div>
+    </div>
+    <p class="lead">У него заложена база лучших практик — что в задаче обязано быть. Смотрит ваши 5 задач, а где данных мало — <span class="amber">задаёт вопросы</span> и вытягивает ваш процесс. Настройка = правка .md, без кода.</p>
+  </section>
+
+  <!-- 5 · КАК РАБОТАЕТ СКИЛЛ — ПРОЦЕСС (линейный) -->
+  <section class="slide" data-notes="Сначала — как вообще устроена работа скилла с задачей. Пять шагов, слева направо. [синхронно с анимацией] Захват задачи из Jira с контекстом. Черновик ТЗ по шаблону команды. Самокритика по чек-листу — скилл сам находит, чего не хватает. Задаёт человеку уточняющие вопросы. И выгружает готовое: Confluence, поля Jira, метка Ready. Человек на каждом стыке: дальше, поправить, стоп. Это фундамент. А теперь — три вещи, которые делают его не просто генератором.">
+    <div class="kicker"><span class="dot">●</span> как это работает · путь задачи</div>
+    <h2>От сырой задачи — <span class="green">к готовому ТЗ.</span></h2>
+    <div class="pipehead">
+      <span class="lbl">ПУТЬ ЗАДАЧИ</span>
+      <span class="cnt" id="pipe-counter">этап 1/5</span>
+      <span class="dots" id="pipe-dots"></span>
+      <span class="lbl" style="margin-left:auto;opacity:.6">human-in-the-loop на каждом шаге</span>
+    </div>
+    <div class="pipeline" id="pipeline" data-total="1" data-item="этап" data-feed="задача доведена до Ready" data-fin="✓ Ready">
+      <div class="pstage" data-state="тяну из Jira…" data-done="✓" data-dur="800"><div class="pic">📥</div><div class="pname">Захват</div><div class="pdesc">задача + эпик + похожие</div><div class="pstate"></div></div>
+      <div class="parrow">→</div>
+      <div class="pstage" data-state="пишу черновик…" data-done="✓" data-dur="850"><div class="pic">📝</div><div class="pname">Черновик</div><div class="pdesc">по template.md</div><div class="pstate"></div></div>
+      <div class="parrow">→</div>
+      <div class="pstage guard" data-state="проверяю по чек-листу…" data-done="✓" data-dur="950"><div class="pic">🔍</div><div class="pname">Самокритика</div><div class="pdesc">checklist.md</div><div class="pstate"></div></div>
+      <div class="parrow">→</div>
+      <div class="pstage" data-state="уточняю у человека…" data-done="✓" data-dur="850"><div class="pic">❓</div><div class="pname">Вопросы</div><div class="pdesc">чего не хватает</div><div class="pstate"></div></div>
+      <div class="parrow">→</div>
+      <div class="pstage guard" data-state="выгружаю…" data-done="✓ метка Ready" data-dur="850"><div class="pic">✅</div><div class="pname">Выгрузка</div><div class="pdesc">Confluence + Jira</div><div class="pstate"></div></div>
+    </div>
+    <div class="feed" id="pipe-feed"></div>
+    <p class="lead" style="margin-top:.8rem">Сырая Jira-задача входит → чёткое ТЗ выходит. Это фундамент. Дальше — три фичи, которые продают.</p>
+  </section>
+
+  <!-- 6 · ФИЧА 1 — САМ ЗАВОДИТ ЗАДАЧИ -->
+  <section class="slide" data-notes="Фича первая, и это вау. Обсудили фичу в чате или на встрече — просто тегните агента. Он вытащит суть из переписки или из расшифровки встречи в Jazz и сам откроет задачу в Jira — сразу по вашему процессу: нужные поля, структура, критерии приёмки. Он уже знает ваш стандарт, поэтому задача рождается готовой, а не сырой. Обсуждение больше не теряется между чатом и доской.">
+    <div class="kicker"><span class="dot">●</span> фича 1 · захват из жизни</div>
+    <h2>Сам заводит задачи <span class="amber">по вашему процессу.</span></h2>
+    <div class="chain">
+      <div class="node"><span class="big">💬</span><span class="lbl">чат · встреча Jazz</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big">🏷️</span><span class="lbl">@ready — один тег</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big green">📋</span><span class="lbl">задача в Jira по стандарту</span></div>
+    </div>
+    <p class="lead">Тегни агента в переписке или дай ему встречу из Jazz — он вытащит суть и <span class="amber">откроет готовую задачу</span>: нужные поля, структура, критерии. Он уже знает ваш процесс. Обсуждение → задача в один тег.</p>
+  </section>
+
+  <!-- 7 · ФИЧА 2 — ОХРАНЯЕТ ВХОДЯЩИЕ -->
+  <section class="slide" data-notes="Фича вторая — охрана. Скилл постоянно мониторит Jira. Кто-то завёл задачу — он тут же сверяет её с вашим процессом. Видит, что нет критериев приёмки, нет макета, не указана метрика — и сразу пишет комментарий автору: вот чего не хватает, докиньте, тогда задача пойдёт в работу. Недооформленное не проходит дальше. Ваш процесс охраняется автоматически, без надзирателя-тимлида.">
+    <div class="kicker"><span class="dot">●</span> фича 2 · охрана процесса</div>
+    <h2>Ловит сырую задачу <span class="amber">на входе.</span></h2>
+    <div class="term">
+      <div class="top"><i style="background:#f4604f"></i><i style="background:#f5b942"></i><i style="background:#4ade80"></i><span class="ttl">Jira · PROJ-142 «Оплата по СБП»</span></div>
+      <div class="body">
+        <span class="bot">🤖 ready</span> <span class="step">— автопроверка по вашему процессу</span><br>
+        <span class="bad">✗ нет критериев приёмки</span><br>
+        <span class="bad">✗ нет макета экрана оплаты</span><br>
+        <span class="bad">✗ не указана продуктовая метрика</span><br>
+        <span class="bot">💬 @reporter, докиньте — и задача пойдёт в работу</span> <span class="cursor"></span>
+      </div>
+    </div>
+    <p class="lead">Мониторит очередь Jira → сверяет с процессом → <span class="amber">сам комментирует автору</span>, чего не хватает, и просит докинуть. Недооформленное не проходит дальше.</p>
+  </section>
+
+  <!-- 8 · ФИЧА 3 — САМОЭВОЛЮЦИЯ ПРОЦЕССА -->
+  <section class="slide" data-notes="И третья — то, ради чего этот хакатон. Самоэволюция. Раз в спринт скилл смотрит на все задачи команды: какие влетали, как их описывали, как они менялись, как часто их переоткрывали. И на этих знаниях предлагает, чем улучшить сам процесс — что добавить в чек-лист, что убрать. Его задача — делать процесс вашей команды лучше от спринта к спринту. [важно] Но меняет процесс не он — он предлагает diff к markdown, Apply жмёт человек. Самосовершенствование, которое видно и объяснимо.">
+    <div class="kicker"><span class="dot">●</span> фича 3 · самоэволюция · то, что хотят жюри</div>
+    <h2>Улучшает <span class="amber">ваш процесс</span> — сам.</h2>
+    <div class="chain">
+      <div class="node"><span class="big">📅</span><span class="lbl">раз в спринт</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big">👀</span><span class="lbl">что влетало · как менялось · реопены</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big">💡</span><span class="lbl">что улучшить в процессе</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big">✏️</span><span class="lbl">diff к .md</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="big green">✅</span><span class="lbl">apply человеком</span></div>
+    </div>
+    <p class="lead">Скилл видит прошлый спринт целиком и предлагает, чем улучшить процесс команды. <span class="amber">Предлагает — не меняет сам:</span> каждое изменение видно, причина видна, апрув обязателен. Прозрачное самосовершенствование.</p>
+  </section>
+
+  <!-- 9 · ЭФФЕКТ AS IS → TO BE -->
+  <section class="slide" data-notes="Эффект. Мы намеренно показываем не рубли, а операционные метрики — рубли посчитаем на данных пилота, врать не будем. Время задачи до Ready — с дней до часов. Доля возвратов — с четверти до менее десяти процентов. Уточнений «что имел в виду» — с трёх-пяти до нуля. Онбординг новичка — с недель до дней. [честно] Это оценка модели, замеряем на пилотной команде по выгрузке Jira.">
+    <div class="kicker"><span class="dot">●</span> эффект · AS IS → TO BE</div>
+    <h2>Меньше возвратов. <span class="amber">Быстрее до Ready.</span></h2>
+    <div class="cards">
+      <div class="card" style="animation-delay:.05s"><div class="ic">⏱️</div><div class="metric">Время до Ready</div><div class="move"><span class="from">дни</span><span class="ar">→</span><span class="to">часы</span></div></div>
+      <div class="card" style="animation-delay:.18s"><div class="ic">↩️</div><div class="metric">Доля возвратов</div><div class="move"><span class="from">~25%</span><span class="ar">→</span><span class="to">&lt;10%</span></div></div>
+      <div class="card" style="animation-delay:.31s"><div class="ic">❓</div><div class="metric">Уточнений на задачу</div><div class="move"><span class="from">3–5</span><span class="ar">→</span><span class="to">0–1</span></div></div>
+      <div class="card" style="animation-delay:.44s"><div class="ic">🚀</div><div class="metric">Онбординг новичка</div><div class="move"><span class="from">недели</span><span class="ar">→</span><span class="to">дни</span></div></div>
+    </div>
+    <div class="quote"><b>Цифры — оценка модели.</b> Value to Cost и рублёвый эффект считаем на данных пилотной команды. Внедрение процесса ≈ бесплатно: не пишем регламент, добываем из 5 задач.</div>
+  </section>
+
+  <!-- 10 · ФИНАЛ + РЕАЛИЗУЕМОСТЬ -->
+  <section class="slide" data-notes="Реализуемость. Всё это — скилл поверх Ouroboros: SKILL.md роли, A2A-оркестрация, MCP Atlassian для Jira и Confluence, интеграции с чатом и Jazz. Порог внедрения — ноль, работает поверх того, что у команды уже есть. [пауза, в зал] И главное обещание — вот оно. Сегодня он доводит задачу до готовности. Завтра — держит нить от идеи до релиза. Спасибо.">
+    <div class="kicker"><span class="dot">●</span> реализуемость · приглашение</div>
+    <h2>Скилл поверх <span class="amber">Ouroboros</span> + MCP Atlassian.</h2>
+    <div class="typed term-prompt"><span data-type="ready --calibrate 5-задач && ship" data-type-speed="80"></span><span class="tcur">▋</span></div>
+    <div class="closer">«Сегодня он доводит задачу до готовности. Завтра — держит нить от идеи до релиза.»</div>
+  </section>
+
+</div>
+
+<div id="counter">01 / 01</div>
+<div id="hint">← → листать · N — заметки спикера · F — fullscreen</div>
+<div id="notes"><div class="ttl">🎤 заметки спикера</div><div id="notes-body"></div></div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const bar=document.getElementById('bar'), counter=document.getElementById('counter');
+  const notes=document.getElementById('notes'), notesBody=document.getElementById('notes-body');
+  let i=0, chainGen=0, pipeGen=0;
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const fmt=n=>String(n+1).padStart(2,'0');
+
+  function render(){
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    bar.style.width=(slides.length>1?(i/(slides.length-1)*100):100)+'%';
+    counter.textContent=fmt(i)+' / '+fmt(slides.length-1);
+    notesBody.innerHTML='<p>'+(slides[i].dataset.notes||'—').replace(/\[(.*?)\]/g,'<span class="pause">[$1]</span>')+'</p>';
+    slides[i].querySelectorAll('.tab,.card').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
+    chainGen++; pipeGen++;            // cancel any in-flight loops on every move
+    const cur=slides[i];
+    if(cur.querySelector('.chain'))    runChain(cur);
+    if(cur.querySelector('.clist'))    cascade(cur);
+    if(cur.querySelector('.pipeline')) runPipeline(cur);
+    if(cur.querySelector('[data-type]')) typeText(cur);
+    if(cur.querySelector('.count') && !cur.querySelector('.chain')) cur.querySelectorAll('.count').forEach(c=>countUp(c,1100));
+  }
+  function go(n){i=Math.max(0,Math.min(slides.length-1,n));render()}
+
+  // count number 0 → data-to
+  function countUp(el,dur){
+    dur=dur||950; const to=+el.dataset.to, t0=performance.now(), tok=(el._tok=(el._tok|0)+1);
+    (function tick(now){
+      if(el._tok!==tok)return;
+      const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(to*e);
+      if(p<1)requestAnimationFrame(tick); else el.textContent=to;
+    })(t0);
+  }
+  // chain: reveal nodes left→right, count their numbers
+  async function runChain(slide){
+    const myGen=++chainGen, alive=()=>myGen===chainGen;
+    const chain=slide.querySelector('.chain'); chain.classList.add('seq');
+    const kids=[...chain.children]; kids.forEach(k=>k.classList.remove('show'));
+    slide.querySelectorAll('.count').forEach(c=>c.textContent='0');
+    await sleep(350); if(!alive())return;
+    for(const k of kids){
+      if(!alive())return;
+      k.classList.add('show');
+      const c=k.querySelector?.('.count'); if(c)countUp(c,1300);
+      await sleep(k.classList.contains('arrow')?520:820);
+    }
+  }
+  // cascade list rows in + count any stats on the slide
+  function cascade(slide){
+    const wall=slide.querySelector('.clist');
+    if(wall){
+      wall.classList.add('cascade');
+      [...wall.children].forEach((d,k)=>{d.style.animation='none';void d.offsetHeight;d.style.animation='gitin .5s ease '+(0.15+k*0.12).toFixed(2)+'s both'});
+    }
+    slide.querySelectorAll('.count').forEach(c=>countUp(c,1100));
+  }
+  // type out [data-type] text
+  function typeText(slide){
+    const el=slide.querySelector('[data-type]'); if(!el)return;
+    const txt=el.dataset.type, spd=+(el.dataset.typeSpeed||70); el.textContent='';
+    const tok=(el._tok=(el._tok|0)+1); let k=0;
+    (function step(){ if(el._tok!==tok)return; el.textContent=txt.slice(0,k++); if(k<=txt.length)setTimeout(step,spd) })();
+  }
+  // data-driven animated pipeline (loops)
+  async function runPipeline(slide){
+    const root=slide.querySelector('.pipeline'); if(!root)return;
+    const myGen=++pipeGen, alive=()=>myGen===pipeGen;
+    const stages=[...root.querySelectorAll('.pstage')];
+    const counterEl=slide.querySelector('#pipe-counter'), feed=slide.querySelector('#pipe-feed'), dots=slide.querySelector('#pipe-dots');
+    const TOTAL=+(root.dataset.total||stages.length), word=root.dataset.item||'Item';
+    if(dots){dots.innerHTML='';for(let k=0;k<stages.length;k++){const d=document.createElement('i');d.className='sdot';dots.appendChild(d)}}
+    const dotEls=dots?[...dots.children]:[];
+    if(feed)feed.innerHTML='';
+    for(let n=1;n<=TOTAL;n++){
+      if(!alive())return;
+      stages.forEach(s=>{s.classList.remove('on','done');const ps=s.querySelector('.pstate');if(ps)ps.innerHTML=''});
+      let st=0;
+      for(const s of stages){
+        if(!alive())return;
+        if(counterEl)counterEl.textContent=word+' '+(++st)+'/'+stages.length;
+        s.classList.add('on');
+        const ps=s.querySelector('.pstate');
+        if(ps&&s.dataset.state)ps.innerHTML='<span class="mut">'+s.dataset.state+'</span>';
+        await sleep(+(s.dataset.dur||800)); if(!alive())return;
+        if(ps&&s.dataset.done)ps.innerHTML='<span class="ok">'+s.dataset.done+'</span>';
+        s.classList.replace('on','done');
+        if(dotEls[st-1])dotEls[st-1].classList.add('full');
+      }
+      if(feed){const line=document.createElement('div');line.innerHTML='<span class="ok">✓</span> '+(root.dataset.feed||word);feed.prepend(line)}
+      await sleep(450); if(!alive())return;
+    }
+    if(!alive())return;
+    if(counterEl)counterEl.innerHTML='<span class="ok">'+(root.dataset.fin||'Готово ✓')+'</span>';
+    await sleep(2800); if(!alive())return; runPipeline(slide);
+  }
+
+  // chaos tabs — сырые задачи из реального бэклога
+  const tabsEl=document.getElementById('tabs');
+  if(tabsEl){
+    ['пофиксить оплату @вася, горит','нужно к пятнице','глянь плз','как обсуждали','дубль #142?','срочно!!!','без описания','TBD','@все помогите','переделать','а критерии?','final_v2'].forEach((t,k)=>{
+      const d=document.createElement('div');d.className='tab';d.style.animationDelay=(k*.08)+'s';d.textContent=t;tabsEl.appendChild(d);
+    });
+  }
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    else if(e.key==='Home')go(0);
+    else if(e.key==='End')go(slides.length-1);
+    else if(e.key.toLowerCase()==='n')notes.classList.toggle('show');
+    else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  });
+  document.getElementById('deck').addEventListener('click',e=>{go(e.clientX<window.innerWidth*0.25?i-1:i+1)});
+  render();
+</script>
+</body>
+</html>
