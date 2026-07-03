@@ -1,4 +1,4 @@
-# Ресёрч исполнимости: Ready на Ouroboros (02.07.2026)
+# Ресёрч исполнимости: GigaSpec на Ouroboros (02.07.2026)
 
 > Проверка по коду Ouroboros (`/Users/stasp/dev/ouroboros`, v6.54.2, [github.com/razzant/ouroboros](https://github.com/razzant/ouroboros)) + интернет-ресёрч внешних зависимостей.
 > **Вердикт: идея исполнима целиком на штатных механизмах.** Красных блокеров нет. Главная неопределённость — Jazz API.
