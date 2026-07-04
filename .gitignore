@@ -5,6 +5,5 @@
 .claude/
 .memsearch/
 
-# BMad — установленный фреймворк и его выводы
+# BMad — установленный фреймворк
 _bmad/
-_bmad-output/
