@@ -45,6 +45,10 @@
 ## Артефакты подачи (в корне репозитория)
 
 - `PROPOSAL.md` — **заявка** (Project Proposal) по 6 критериям.
+- `presentation/` — питч-материалы: HTML-дека `gigaspec-pitch-deck.html`, нарратив доклада
+  (`story-*.md`) и раскадровка слайдов (`slides-storyboard-*.md`).
+- `email-package/` — готовые PDF для отправки жюри: `GigaSpec-Proposal.pdf` и
+  `GigaSpec-Pitch-Deck.pdf` (статичный 1:1-рендер деки).
 - `DISCUSSION.md` — открытые вопросы (питч, оргимена, действия до подачи); решения синка —
   в PROPOSAL/этом README, полный протокол — в git-истории.
 - `TEAM.md` — состав команды, роли, контакты, доступы.
