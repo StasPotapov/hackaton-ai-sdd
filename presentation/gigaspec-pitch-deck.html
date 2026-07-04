@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <!--
   Питч-дека GigaSpec — Sber AI Hack, команда «Гуси-Лебеди».
-  Собрана по раскадровке _bmad-output/slides-storyboard-2026-07-04.md
+  Собрана по раскадровке presentation/slides-storyboard-2026-07-04.md
   на движке шаблона скилла /present. Акцент — Сбер-зелёный.
-  Навигация: ← → листать · N — заметки спикера · F — fullscreen.
+  Режим самостоятельного просмотра (сайт, без спикера): зелёные подписи
+  .expl внизу каждого слайда ведут рассказ вместо закадрового голоса,
+  полный текст доклада — по клавише N.
+  Навигация: ← → / клик / свайп — листать · N — текст доклада · F — fullscreen.
 -->
 <html lang="ru">
 <head>
@@ -21,7 +24,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;background:#000;color:var(--text);font-family:var(--sans);overflow:hidden}
   #deck{position:relative;height:100vh;width:100vw}
-  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:7vh 9vw;background:transparent;z-index:1;animation:fade .55s cubic-bezier(.2,.7,.2,1)}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:7vh 9vw;background:transparent;z-index:1;animation:fade .85s cubic-bezier(.2,.7,.2,1)}
   .slide.active{display:flex}
   @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
@@ -32,7 +35,7 @@
   .lead{font-size:clamp(1.1rem,2vw,1.6rem);color:var(--muted);line-height:1.5;max-width:48ch;margin-top:1.4rem}
   .amber{color:var(--amber)} .green{color:var(--green)} .danger{color:var(--danger)} .blue{color:var(--blue)} .text{color:var(--text)} .muted{color:var(--muted)}
   .mono{font-family:var(--mono)}
-  #bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--green),var(--blue));z-index:50;transition:width .4s ease}
+  #bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--green),var(--blue));z-index:50;transition:width .6s cubic-bezier(.2,.7,.2,1)}
   #counter{position:fixed;bottom:22px;right:30px;font-family:var(--mono);font-size:.78rem;color:var(--muted);z-index:50}
   #hint{position:fixed;bottom:22px;left:30px;font-family:var(--mono);font-size:.72rem;color:#4a4e5c;z-index:50}
   /* title */
@@ -41,33 +44,53 @@
   .badge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.8rem;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:.4rem .9rem;width:fit-content}
   /* tabs (chaos) */
   .tabs{display:flex;gap:6px;flex-wrap:wrap;max-width:60ch;margin-top:.5rem}
-  .tab{font-family:var(--mono);font-size:.72rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-top-color:#3a3030;border-radius:7px 7px 0 0;padding:.35rem .7rem;opacity:0;animation:rise .4s forwards}
+  .tab{font-family:var(--mono);font-size:.72rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-top-color:#3a3030;border-radius:7px 7px 0 0;padding:.35rem .7rem;opacity:0;animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
   /* big glitch word */
   .enemy{font-size:clamp(3rem,11vw,9rem);font-weight:850;letter-spacing:-.03em;color:var(--danger);line-height:.95;animation:enemyglitch 2s infinite}
   @keyframes enemyglitch{0%,88%,100%{text-shadow:none;transform:none}90%{text-shadow:-3px 0 #06b6d4,3px 0 #f4604f;transform:translateX(2px) skewX(-1deg)}94%{text-shadow:3px 0 #06b6d4,-3px 0 #f4604f;transform:translateX(-2px)}97%{text-shadow:-2px 0 #06b6d4,2px 0 #f4604f;transform:none}}
+  /* hero word — self-evolution */
+  .evo-row{display:flex;align-items:center;gap:1.7rem;flex-wrap:wrap;margin-top:.4rem}
+  .evolve{font-size:clamp(2.4rem,7vw,5.4rem);font-weight:850;letter-spacing:-.03em;line-height:.98;color:var(--green);width:fit-content;animation:evoglow 3.4s ease-in-out infinite}
+  @keyframes evoglow{0%,100%{text-shadow:0 0 22px rgba(74,222,128,.3)}50%{text-shadow:0 0 48px rgba(74,222,128,.7)}}
+  /* ouroboros — snake biting its own tail (Ouroboros platform) */
+  .ouro{width:clamp(88px,9vw,128px);height:auto;flex:none;filter:drop-shadow(0 0 9px rgba(74,222,128,.4))}
+  .ouro-spin{transform-box:view-box;transform-origin:232.5px 232.5px;animation:ouroturn 17s linear infinite}
+  @keyframes ouroturn{to{transform:rotate(360deg)}}
   /* cards row */
   .cards{display:flex;gap:1.1rem;flex-wrap:wrap;margin-top:2.4rem}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.5rem;min-width:160px;opacity:0;animation:rise .5s forwards}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.5rem;min-width:160px;opacity:0;animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
   .card .ic{font-size:2rem}
   .card .nm{font-weight:700;margin-top:.5rem;font-size:1.1rem}
   .card .rl{color:var(--muted);font-size:.85rem;margin-top:.15rem}
   .quote{margin-top:2.4rem;border-left:3px solid var(--amber);padding:.5rem 0 .5rem 1.3rem;max-width:60ch}
   .quote b{color:var(--amber)}
+  /* подпись-рассказчик: заменяет голос спикера при самостоятельном просмотре */
+  .expl{border-left:3px solid var(--green);background:rgba(74,222,128,.07);border-radius:0 12px 12px 0;padding:.85rem 1.2rem;margin-top:2rem;max-width:88ch;color:#c9cdd9;font-size:clamp(.88rem,1.4vw,1.06rem);line-height:1.55}
+  .expl b{color:var(--green)}
   /* chain (sequential reveal + count) */
   .chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:3rem;font-family:var(--mono)}
   .node{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1.3rem;display:flex;flex-direction:column;gap:.3rem}
   .node .big{font-size:1.7rem;font-weight:800;color:var(--amber)}
   .node .lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
   .arrow{display:flex;align-items:center;color:var(--line);font-size:1.6rem;padding:0 .7rem}
-  .chain.seq .node{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .chain.seq .node{opacity:0;transform:translateY(24px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1)}
   .chain.seq .node.show{opacity:1;transform:none}
-  .chain.seq .arrow{opacity:.18;color:var(--line);transition:opacity .5s ease,color .5s ease,text-shadow .5s ease}
+  .chain.seq .arrow{opacity:.18;color:var(--line);transition:opacity .85s cubic-bezier(.2,.7,.2,1),color .85s cubic-bezier(.2,.7,.2,1),text-shadow .85s cubic-bezier(.2,.7,.2,1)}
   .chain.seq .arrow.show{opacity:1;color:var(--amber);text-shadow:0 0 16px rgba(74,222,128,.85)}
   /* cascade list ("wall") */
   .clist{font-family:var(--mono);font-size:clamp(.6rem,1.15vw,.92rem);line-height:1.55;background:#070809;border:1px solid var(--line);border-radius:12px;padding:1.4rem 1.6rem;margin-top:1.4rem;max-height:62vh;overflow:hidden;column-count:2;column-gap:2.4rem}
   .clist .h{color:#5a6cf5}.clist .s{color:var(--green)}.clist .t{color:var(--muted)}
   .clist.cascade > div{opacity:0}
   @keyframes gitin{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+  /* mechanisms grid (реализуемость) */
+  .mechs{display:grid;grid-template-columns:1fr 1fr;gap:.85rem 1.15rem;margin-top:1.5rem}
+  .mech{background:var(--surface);border:1px solid var(--line);border-left:3px solid #2f6b43;border-radius:13px;padding:.95rem 1.2rem;opacity:0;animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+  .mech .mtop{display:flex;align-items:center;gap:.7rem}
+  .mech .tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;color:#9aabff;background:rgba(90,108,245,.13);border:1px solid rgba(90,108,245,.35);border-radius:6px;padding:.16rem .55rem;flex:none}
+  .mech .nm{font-weight:750;font-size:clamp(1rem,1.5vw,1.15rem);letter-spacing:-.01em}
+  .mech .ds{color:var(--muted);font-size:clamp(.85rem,1.15vw,.98rem);line-height:1.42;margin-top:.5rem}
+  .mech .ds b{color:#c7ccd8;font-weight:600}
+  @media (max-width:760px){.mechs{grid-template-columns:1fr}}
   /* stat strip */
   .stats{display:flex;gap:2.5rem;flex-wrap:wrap;margin-top:2.2rem}
   .stat .n{font-size:clamp(2rem,4.5vw,3.6rem);font-weight:850;color:var(--green)}
@@ -87,21 +110,23 @@
   .pipehead .cnt{color:var(--amber);font-weight:700}
   .pipehead .cnt .ok{color:var(--green)}
   .dots{display:flex;gap:5px}
-  .sdot{width:18px;height:6px;border-radius:3px;background:var(--line);display:inline-block;transition:background .3s}
+  .sdot{width:18px;height:6px;border-radius:3px;background:var(--line);display:inline-block;transition:background .45s cubic-bezier(.2,.7,.2,1)}
   .sdot.full{background:var(--green)}
-  .pipeline{display:flex;align-items:stretch;gap:0;margin-top:.3rem;font-family:var(--mono);flex-wrap:wrap}
-  .pstage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;min-width:122px;transition:opacity .3s,border-color .3s,box-shadow .3s;opacity:.4}
-  .pstage.on{opacity:1;border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 0 26px -8px var(--amber)}
+  .pipeline{display:flex;align-items:stretch;gap:0;row-gap:1rem;margin-top:.3rem;font-family:var(--mono);flex-wrap:wrap}
+  .pstage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;min-width:122px;transition:border-color .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s cubic-bezier(.2,.7,.2,1)}
+  .pstage.on{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber),0 0 26px -8px var(--amber)}
   .pstage.guard.on{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 26px -8px var(--green)}
-  .pstage.done{opacity:.92;border-color:#2f6b43}
+  .pstage.done{border-color:#2f6b43}
   .pstage .pic{font-size:1.3rem}
   .pstage .pname{font-weight:700;margin-top:.35rem;font-size:.92rem}
   .pstage .pdesc{color:var(--muted);font-size:.68rem;margin-top:.15rem;line-height:1.3}
   .pstage .pstate{font-size:.72rem;margin-top:.5rem;min-height:1.15em}
   .pstate .mut{color:var(--muted)}.pstate .warn{color:var(--amber)}.pstate .ok{color:var(--green)}
   .parrow{display:flex;align-items:center;color:var(--line);padding:0 .4rem;font-size:1.2rem}
-  .feed{font-family:var(--mono);font-size:.8rem;margin-top:1rem;min-height:3.4em;line-height:1.75;color:var(--muted)}
+  .feed{font-family:var(--mono);font-size:.8rem;margin-top:.9rem;min-height:2.2em;line-height:1.7;color:var(--muted)}
   .feed .ok{color:var(--green)}
+  .ckpt{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin-top:.9rem;line-height:1.55;max-width:82ch;border-left:2px solid var(--amber);padding-left:.95rem}
+  .ckpt b{color:var(--amber)}
   /* typed line + glow */
   .typed{font-family:var(--mono);font-size:clamp(1.3rem,3.4vw,2.6rem);font-weight:700;color:var(--bg);background:var(--amber);border-radius:14px;padding:1.1rem 1.8rem;width:fit-content;margin-top:2.2rem;animation:typedglow 2.6s ease-in-out infinite}
   .typed.term-prompt::before{content:'$ ';opacity:.5}
@@ -130,12 +155,13 @@
 <div id="deck">
 
   <!-- 1 · ТИТУЛ -->
-  <section class="slide active" data-notes="[3–4 секунды тишины — дать прочитать титул] Дальше питч начинается сразу с истории — листай на виньетку и говори.">
+  <section class="slide active" data-notes="Дека рассчитана на самостоятельный просмотр: зелёные подписи внизу слайдов ведут рассказ вместо спикера, а под клавишей N на каждом слайде — полный текст доклада.">
     <div class="title-wrap">
       <div class="badge mono">SBER AI HACK · КОМАНДА «ГУСИ-ЛЕБЕДИ»</div>
       <h1 style="margin-top:1.8rem">Giga<span class="green">Spec</span></h1>
       <div class="title-sub">Самоэволюционирующийся SDD-оркестратор на платформе Ouroboros</div>
       <p class="lead" style="max-width:60ch">Держит нить от идеи до PR — и с каждым спринтом дотачивает ваш процесс сам.</p>
+      <div class="expl"><b>GigaSpec</b> — агент, который добывает у команды её собственный процесс разработки, а затем сам ведёт по нему каждую задачу: от сообщения в чате до проверенного pull request. Дека рассчитана на просмотр без спикера — зелёные подписи ведут рассказ. Листайте →</div>
     </div>
   </section>
 
@@ -152,12 +178,13 @@
       </div>
     </div>
     <div class="cards" style="margin-top:1.6rem">
-      <div class="card" style="animation-delay:.1s"><div class="nm">Какой фильтр?</div><div class="rl">в задаче — одна строчка</div></div>
-      <div class="card" style="animation-delay:.5s"><div class="nm">Где обсуждали?</div><div class="rl">автор — на встречах</div></div>
-      <div class="card" style="animation-delay:.9s"><div class="nm">Созвон без записи</div><div class="rl">каждый понял по-своему</div></div>
-      <div class="card" style="animation-delay:1.3s"><div class="nm danger" >Через 2 недели — переделка</div><div class="rl">«я имел в виду другое»</div></div>
+      <div class="card" style="animation-delay:.15s"><div class="nm">Какой фильтр?</div><div class="rl">в задаче — одна строчка</div></div>
+      <div class="card" style="animation-delay:.7s"><div class="nm">Где обсуждали?</div><div class="rl">автор — на встречах</div></div>
+      <div class="card" style="animation-delay:1.25s"><div class="nm">Созвон без записи</div><div class="rl">каждый понял по-своему</div></div>
+      <div class="card" style="animation-delay:1.8s"><div class="nm danger" >Через 2 недели — переделка</div><div class="rl">«я имел в виду другое»</div></div>
     </div>
-    <div class="closer">Знакомо?</div>
+    <div class="closer" style="margin-top:1.6rem">Знакомо?</div>
+    <div class="expl" style="margin-top:1.3rem">Дело не в Лене и не в постановщике. У команды нет общего ответа на вопрос <b>«что значит — задача готова к работе?»</b> — контекст живёт в созвонах и теряется. Итог: две недели работы — и переделка.</div>
   </section>
 
   <!-- 3 · ПАРАДОКС -->
@@ -170,6 +197,7 @@
       <div class="card" style="animation-delay:.45s"><div class="ic">🌀</div><div class="nm">«Давайте сначала договоримся»</div><div class="rl">внедрение буксует годами</div></div>
     </div>
     <div class="quote"><b>Процесс нельзя написать сверху.</b> Но его можно — добыть.</div>
+    <div class="expl" style="margin-top:1.3rem"><b>SDD (Spec-Driven Development)</b> — разработка «от задания»: сначала чёткое ТЗ, потом код. Пользу понимают все, но как процесс устроен «именно у нас» — нигде не записано: знание живёт в головах. Значит, его надо оттуда достать.</div>
   </section>
 
   <!-- 4 · ПЕРЕВОРОТ -->
@@ -185,7 +213,7 @@
       <div class="arrow">→</div>
       <div class="node" style="border-color:#2f6b43"><span class="big green">ваш .md</span><span class="lbl">чек-лист + шаблоны</span></div>
     </div>
-    <p class="lead">Правится как заметка — без кода, без консультантов, без сорока страниц.</p>
+    <div class="expl"><b>Первый запуск GigaSpec.</b> Агент интервьюирует команду, как опытный тимлид на онбординге, и параллельно сканирует Jira, Confluence и чаты. Расхождения между «как говорим» и «как делаем» становятся вопросами, ответы — вашим стандартом: чек-лист и шаблоны в обычных .md-файлах. Правится как заметка — без кода, без консультантов, без сорока страниц.</div>
   </section>
 
   <!-- 5 · КОНВЕЙЕР (живой pipeline) -->
@@ -199,20 +227,21 @@
       <span class="lbl" style="margin-left:auto;opacity:.6">↻ человек на каждом стыке: дальше / поправить / стоп</span>
     </div>
     <div class="pipeline" id="pipeline" data-total="3" data-item="Задача" data-feed="PR открыт — задача" data-fin="Нить не рвётся ✓">
-      <div class="pstage" data-state="ловлю…" data-done="✓ поймал" data-dur="700"><div class="pic">📡</div><div class="pname">Сигнал</div><div class="pdesc">Jira · чат · встреча в Jazz</div><div class="pstate"></div></div>
+      <div class="pstage" data-state="ловлю…" data-done="✓ поймал" data-dur="950"><div class="pic">📡</div><div class="pname">Сигнал</div><div class="pdesc">Jira · чат · встреча в Jazz</div><div class="pstate"></div></div>
       <div class="parrow">→</div>
-      <div class="pstage" data-state="уточняю…" data-done="✓ готово" data-dur="1000"><div class="pic">📋</div><div class="pname">ТЗ</div><div class="pdesc">черновик → самокритика → вопросы</div><div class="pstate"></div></div>
+      <div class="pstage" data-state="уточняю…" data-done="✓ готово" data-dur="1250"><div class="pic">📋</div><div class="pname">ТЗ</div><div class="pdesc">черновик → самокритика → вопросы</div><div class="pstate"></div></div>
       <div class="parrow">→</div>
-      <div class="pstage" data-state="считаю…" data-done="✓" data-dur="700"><div class="pic">📊</div><div class="pname">Аналитика</div><div class="pdesc">по процессу команды</div><div class="pstate"></div></div>
+      <div class="pstage" data-state="считаю…" data-done="✓" data-dur="950"><div class="pic">📊</div><div class="pname">Аналитика</div><div class="pdesc">по процессу команды</div><div class="pstate"></div></div>
       <div class="parrow">→</div>
-      <div class="pstage" data-state="рисую…" data-done="✓" data-dur="700"><div class="pic">🎨</div><div class="pname">Дизайн</div><div class="pdesc">бриф + критерии</div><div class="pstate"></div></div>
+      <div class="pstage" data-state="рисую…" data-done="✓" data-dur="950"><div class="pic">🎨</div><div class="pname">Дизайн</div><div class="pdesc">бриф + критерии</div><div class="pstate"></div></div>
       <div class="parrow">→</div>
-      <div class="pstage" data-state="пишу…" data-done="✓" data-dur="900"><div class="pic">💻</div><div class="pname">Код</div><div class="pdesc">изолированная ветка</div><div class="pstate"></div></div>
+      <div class="pstage" data-state="пишу…" data-done="✓" data-dur="1150"><div class="pic">💻</div><div class="pname">Код</div><div class="pdesc">изолированная ветка</div><div class="pstate"></div></div>
       <div class="parrow">→</div>
-      <div class="pstage guard" data-state="проверяю…" data-done="✓ зелёный" data-dur="900"><div class="pic">🛡️</div><div class="pname">PR</div><div class="pdesc">quality gate: тесты · линт · сборка</div><div class="pstate"></div></div>
+      <div class="pstage guard" data-state="проверяю…" data-done="✓ зелёный" data-dur="1150"><div class="pic">🛡️</div><div class="pname">PR</div><div class="pdesc">quality gate: тесты · линт · сборка</div><div class="pstate"></div></div>
     </div>
     <div class="feed" id="pipe-feed"></div>
-    <p class="lead" style="margin-top:.8rem">Пять глаголов: <span class="text">добывает · применяет · охраняет · учит · эволюционирует</span>.</p>
+    <p class="lead" style="margin-top:.8rem;max-width:none;font-size:clamp(.95rem,1.6vw,1.35rem)"><span class="muted">Пять глаголов:</span> <span class="text">добывает · применяет · охраняет · учит · эволюционирует</span>.</p>
+    <div class="expl" style="margin-top:1rem">↺ <b>Каждый этап — чекпоинт с полным контекстом:</b> можно вернуться, посмотреть, что сделал агент, поправить и перезапустить с этого места. На каждом стыке решает человек: дальше / поправить / стоп. На выходе — проверенный PR, который остаётся только принять.</div>
   </section>
 
   <!-- 6 · ДЕМО 1: обсуждение → задача -->
@@ -229,7 +258,7 @@
         <span class="ok">✓ JIRA · PROJ-1152: описание, критерии приёмки, контекст, ссылки — все поля по чек-листу</span> <span class="cursor"></span>
       </div>
     </div>
-    <p class="lead">Та же карточка, что у Лены, — только заполненная. Обсуждение → задача в один тег.</p>
+    <div class="expl"><b>Кадр из демо.</b> Обсуждение в чате не теряется: по одному тегу агент вытягивает суть, применяет шаблон команды — и в Jira появляется полностью оформленная задача. Та же карточка, что была у Лены в начале, — только теперь все поля заполнены.</div>
   </section>
 
   <!-- 7 · ДЕМО 2: СЦЕНА ОТКАЗА -->
@@ -241,14 +270,27 @@
       <div class="stat"><div class="n" style="color:var(--danger)"><span class="count" data-to="2">0</span></div><div class="l">критичных вопроса не закрыты</div></div>
       <div class="stat"><div class="n" style="color:var(--muted)">СТОП</div><div class="l">код не стартует</div></div>
     </div>
-    <div class="quote"><b>Он отказывается делать плохо — как хороший инженер.</b> Закрываем вопросы — и только тогда: ТЗ в Confluence, метка Ready, ветка, зелёные проверки, PR.</div>
+    <div class="quote"><b>Он отказывается делать плохо — как хороший инженер.</b></div>
+    <div class="expl" style="margin-top:1.2rem"><b>Кадр из демо.</b> Агенту дали размытую задачу и попросили сразу писать код. Он посчитал готовность по чек-листу команды — 45% — и остановился. Закрываем вопросы — и только тогда: ТЗ в Confluence, метка Ready, изолированная ветка, зелёные проверки, PR.</div>
   </section>
 
   <!-- 8 · ДЕМО 3: САМОЭВОЛЮЦИЯ -->
   <section class="slide" data-notes="Момент третий — то, ради чего всё затевалось. Раз в спринт GigaSpec оглядывается на прожитые задачи: что возвращали, что переспрашивали, что переоткрывали. И предлагает: «Восемь задач вернули из-за отсутствия метрик — предлагаю добавить пункт в чек-лист готовности». Показывает точное изменение — diff, тимлид жмёт Apply. Процесс перестаёт быть мёртвым регламентом — он живой и дотачивает сам себя. Но меняется — только через человека. [пауза на кадре с Apply]">
-    <div class="kicker"><span class="dot">●</span> доказательства · демо-момент 3</div>
-    <h2>Раз в спринт — <span class="green">оглядывается и предлагает</span>.</h2>
-    <div class="term">
+    <div class="kicker"><span class="dot">●</span> демо-момент 3 · <span class="green">главная фича</span></div>
+    <div class="evo-row">
+      <svg class="ouro" viewBox="0 0 465 465" aria-hidden="true">
+        <g class="ouro-spin" fill="#4ade80">
+          <!-- уроборос-змея, кусающая свой хвост · SVG Repo, CC0 · глаз — негативное пространство -->
+          <path d="M273.893,39.151c-0.525,0.118-1.069,0.186-1.629,0.188c-0.144,0-0.287,0.009-0.43,0.012l-2.42,44.776c0.141,0.018,0.276,0.051,0.418,0.066c0.922,0.102,1.781,0.374,2.563,0.771c34.121,8.652,65.01,28.589,87.139,56.302C382.404,169.91,395,205.862,395,242.5c0,89.603-72.897,162.5-162.5,162.5S70,332.103,70,242.5c0-36.637,12.597-72.588,35.47-101.229c22.514-28.191,54.094-48.345,88.924-56.747c2.613-0.629,5.365,0.188,7.211,2.142C209.727,95.264,220.699,100,232.5,100c7.573,0,14.799-1.961,21.155-5.632C242.329,87.87,234.84,75.67,234.84,61.836c0-16.14,10.283-29.953,24.641-35.219C252.184,18.906,243.148,15,232.5,15c-15.056,0-28.683,7.718-36.453,20.646c-0.002,0.005-0.005,0.009-0.007,0.013c-0.001,0.002-0.002,0.003-0.003,0.005c-0.001,0.002-0.003,0.004-0.004,0.007c-0.001,0.002-0.003,0.004-0.004,0.007c0,0.001-0.001,0.002-0.001,0.003c-1.036,1.703-2.644,2.849-4.428,3.336c-0.001,0.005-0.007,0.003-0.011,0.004c-0.003,0-0.007,0.001-0.011,0.003c-0.005,0.001-0.008,0.004-0.013,0.003c-0.019,0.005-0.037,0.01-0.056,0.015h0c-0.019,0.006-0.038,0.01-0.057,0.015c-0.001,0.004-0.009,0.003-0.014,0.004c-0.006,0-0.009,0.002-0.014,0.003c-0.004,0.007-0.01,0.003-0.014,0.004c-0.006,0.003-0.009,0.002-0.015,0.004c-0.004,0-0.007,0-0.013,0.003c-0.003,0.001-0.007,0.002-0.011,0.002h0c-0.097,0.023-0.194,0.045-0.292,0.064C94.848,58.634,25,144.154,25,242.5C25,356.916,118.084,450,232.5,450S440,356.916,440,242.5C440,143.711,370.324,58.683,273.893,39.151z M215.979,33.218c4.411,0,8,3.589,8,8s-3.589,8-8,8s-8-3.589-8-8S211.568,33.218,215.979,33.218z"/>
+          <path d="M249.84,61.836c0,11.342,8.388,20.842,19.574,22.291l2.42-44.776C259.667,39.622,249.84,49.615,249.84,61.836z"/>
+        </g>
+      </svg>
+      <div>
+        <div class="evolve">Самоэволюция</div>
+        <p class="lead" style="margin-top:.7rem;max-width:52ch">Раз в спринт сам смотрит, что делал и что происходило в задачах, — и предлагает, что улучшить в вашем процессе.</p>
+      </div>
+    </div>
+    <div class="term" style="margin-top:1.4rem">
       <div class="top"><i style="background:#f4604f"></i><i style="background:#f5b942"></i><i style="background:#4ade80"></i><span class="ttl">gigaspec · ретро спринта</span></div>
       <div class="body">
         <span class="pr">retro:</span> <span class="cmd">8 задач вернули из-за отсутствия метрик</span><br>
@@ -258,57 +300,84 @@
         <span class="step">тимлид:</span> <span class="ok">[ Apply ✓ ]</span> <span class="cursor"></span>
       </div>
     </div>
-    <div class="quote"><b>Процесс живой.</b> Меняется — только через человека: diff → апрув.</div>
+    <div class="expl" style="margin-top:1.2rem"><b>Кадр из демо — ретро спринта.</b> Агент проанализировал прожитые задачи, нашёл системную проблему — 8 возвратов из-за отсутствия метрик — и предложил точечную правку чек-листа в виде diff. Процесс живой, но меняется только через человека: тимлид смотрит и жмёт Apply.</div>
   </section>
 
   <!-- 9 · ЭФФЕКТ: 1-10-100 -->
   <section class="slide" data-notes="Что это даёт? Мы продаём не скорость — качество и предсказуемость. Есть правило один к десяти к ста: дефект, пойманный на задании, в десять раз дешевле дефекта в коде и в сто раз дешевле аварии в проде. [медленно] GigaSpec ловит дефекты там, где они дешевле всего — до кода. Дальше: единый процесс вместо негласных «у каждого свой», онбординг новичка — вопросом «как у нас принято?» с ответом на реальных примерах, и ноль стоимости внедрения — одно интервью вместо месяцев согласований. И это тиражируется: движок один, вся специфика команды — в текстовых файлах.">
     <div class="kicker"><span class="dot">●</span> эффект</div>
     <h2>Продаём не скорость — <span class="green">качество и предсказуемость</span>.</h2>
-    <div class="chain">
-      <div class="node" style="border-color:#2f6b43"><span class="big green count" data-to="1">0</span><span class="lbl">дефект на задании · ловим здесь</span></div>
+    <div style="font-family:var(--mono);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:2.2rem">Цена одного и того же дефекта ↓</div>
+    <div class="chain" style="margin-top:.9rem">
+      <div class="node" style="border-color:#2f6b43"><span class="big green count" data-to="1">0</span><span class="lbl">пойман на задании · здесь ловит GigaSpec</span></div>
       <div class="arrow">→</div>
-      <div class="node"><span class="big count" data-to="10">0</span><span class="lbl">тот же дефект в коде</span></div>
+      <div class="node"><span class="big count" data-to="10">0</span><span class="lbl">дошёл до кода</span></div>
       <div class="arrow">→</div>
-      <div class="node"><span class="big count" data-to="100" style="color:var(--danger)">0</span><span class="lbl">авария в проде</span></div>
+      <div class="node"><span class="big count" data-to="100" style="color:var(--danger)">0</span><span class="lbl">стал аварией в проде</span></div>
     </div>
     <div class="cards" style="margin-top:1.8rem">
       <div class="card" style="animation-delay:.05s"><div class="nm">Единый процесс</div><div class="rl">вместо негласных «у каждого свой»</div></div>
       <div class="card" style="animation-delay:.2s"><div class="nm">Онбординг вопросом</div><div class="rl">«как у нас принято?» — ответ на примерах</div></div>
       <div class="card" style="animation-delay:.35s"><div class="nm">Внедрение ≈ 0</div><div class="rl">одно интервью вместо месяцев согласований</div></div>
     </div>
+    <div class="expl" style="margin-top:1.5rem"><b>Правило 1:10:100:</b> дефект, пойманный на этапе задания, в 10 раз дешевле того же дефекта в коде и в 100 раз дешевле аварии в проде. GigaSpec ловит дефекты на первой ступени — до первой строчки кода.</div>
   </section>
 
   <!-- 10 · РЕАЛИЗУЕМОСТЬ -->
   <section class="slide" data-notes="Всё, что вы видели, — штатные механизмы Ouroboros: скиллы, планировщик, изолированные ветки, проверки, апрувы, учёт стоимости. Мы не строим платформу — мы учим её вести команду за руку. [10 секунд тишины — дать прочитать стену] И это тиражируется: новая команда — новое интервью. Ни строчки кода под команду.">
     <div class="kicker"><span class="dot">●</span> реализуемость · штатные механизмы Ouroboros</div>
     <h2 style="font-size:clamp(1.5rem,3.2vw,2.6rem)">Наш код — конфигурация, промпты и <span class="green">.md</span>.</h2>
-    <div class="clist">
-      <div><span class="h">skill</span> <span class="s">extension-скилл</span> <span class="t">SKILL.md + тонкий plugin-слой</span></div>
-      <div><span class="h">mcp</span> <span class="s">MCP Atlassian</span> <span class="t">Jira и Confluence из коробки</span></div>
-      <div><span class="h">cron</span> <span class="s">scheduled_tasks</span> <span class="t">охрана очереди + ретро спринта</span></div>
-      <div><span class="h">chat</span> <span class="s">telegram-bridge</span> <span class="t">сигналы и пинги, канал-агностично</span></div>
-      <div><span class="h">agent</span> <span class="s">субагенты-роли</span> <span class="t">model lanes под вес этапа</span></div>
-      <div><span class="h">git</span> <span class="s">worktree-изоляция</span> <span class="t">каждая задача в своей ветке</span></div>
-      <div><span class="h">gate</span> <span class="s">quality gate</span> <span class="t">PR только на зелёных проверках</span></div>
-      <div><span class="h">cost</span> <span class="s">Dashboard · Costs</span> <span class="t">видимая цена + бюджет-лимит</span></div>
+    <div class="mechs">
+      <div class="mech" style="animation-delay:.10s">
+        <div class="mtop"><span class="tag">skill</span><span class="nm">Extension-скилл</span></div>
+        <div class="ds">Весь SDD-процесс — в <b>SKILL.md</b> и тонком plugin-слое. Правится как текст, не как код.</div>
+      </div>
+      <div class="mech" style="animation-delay:.19s">
+        <div class="mtop"><span class="tag">mcp</span><span class="nm">MCP Atlassian</span></div>
+        <div class="ds">Заводит задачи в <b>Jira</b> и пишет ТЗ в <b>Confluence</b> напрямую — из коробки.</div>
+      </div>
+      <div class="mech" style="animation-delay:.28s">
+        <div class="mtop"><span class="tag">cron</span><span class="nm">scheduled_tasks</span></div>
+        <div class="ds">По расписанию сторожит очередь задач и раз в спринт запускает <b>ретро</b>.</div>
+      </div>
+      <div class="mech" style="animation-delay:.37s">
+        <div class="mtop"><span class="tag">chat</span><span class="nm">telegram-bridge</span></div>
+        <div class="ds">Ловит <b>сигналы</b> из чатов и шлёт пинги на апрув — канал-агностично.</div>
+      </div>
+      <div class="mech" style="animation-delay:.46s">
+        <div class="mtop"><span class="tag">agent</span><span class="nm">Субагенты-роли</span></div>
+        <div class="ds">Каждый этап — своя роль и свой <b>класс модели</b> под его вес и цену.</div>
+      </div>
+      <div class="mech" style="animation-delay:.55s">
+        <div class="mtop"><span class="tag">git</span><span class="nm">worktree-изоляция</span></div>
+        <div class="ds">Каждая задача пишется в <b>своей ветке</b> — не задевая остальные.</div>
+      </div>
+      <div class="mech" style="animation-delay:.64s">
+        <div class="mtop"><span class="tag">gate</span><span class="nm">Quality gate</span></div>
+        <div class="ds">PR открывается только на <b>зелёных</b> тестах, линте и сборке.</div>
+      </div>
+      <div class="mech" style="animation-delay:.73s">
+        <div class="mtop"><span class="tag">cost</span><span class="nm">Dashboard · Costs</span></div>
+        <div class="ds">Видимая <b>цена</b> каждого запуска и жёсткий лимит по бюджету.</div>
+      </div>
     </div>
-    <p class="lead" style="margin-top:1.2rem">Новая команда — новое интервью. Ни строчки кода под команду.</p>
+    <div class="expl" style="margin-top:1.1rem"><b>Ouroboros</b> — агентная платформа, на которой собран GigaSpec: всё показанное выше — её штатные механизмы, наш вклад — конфигурация, промпты и тонкий plugin-слой. Поэтому тираж прост: новая команда — новое интервью. Ни строчки кода под команду.</div>
   </section>
 
   <!-- 11 · ПРИЗЫВ -->
-  <section class="slide" data-notes="GigaSpec держит нить от идеи до PR — и с каждым спринтом дотачивает ваш процесс сам. [пауза, в зал] Дайте нам основной этап — и мы покажем полный цикл вживую.">
+  <section class="slide" data-notes="GigaSpec держит нить от идеи до PR — и с каждым спринтом дотачивает ваш процесс сам. [пауза, в зал] Одна команда — /gigaspec --init — и он начинает доставать ваш процесс.">
     <div class="kicker"><span class="dot">●</span> приглашение</div>
     <h2>Держит нить от идеи до PR.<br><span class="green">И дотачивает ваш процесс — сам.</span></h2>
-    <div class="typed"><span data-type="Дайте нам основной этап — покажем полный цикл вживую" data-type-speed="60"></span><span class="tcur">▋</span></div>
-    <div class="closer">Команда «Гуси-Лебеди» · GigaSpec на платформе Ouroboros</div>
+    <div class="typed term-prompt"><span data-type="/gigaspec --init" data-type-speed="95"></span><span class="tcur">▋</span></div>
+    <div class="expl"><b>/gigaspec --init</b> — одна команда, с которой всё начинается: агент приходит в команду и первым делом достаёт её процесс. Дайте нам основной этап — покажем полный цикл вживую.</div>
+    <div class="closer" style="margin-top:1.8rem;max-width:none">Команда «Гуси-Лебеди» · GigaSpec на платформе Ouroboros</div>
   </section>
 
 </div>
 
 <div id="counter">01 / 01</div>
-<div id="hint">← → листать · N — заметки спикера · F — fullscreen</div>
-<div id="notes"><div class="ttl">🎤 заметки спикера</div><div id="notes-body"></div></div>
+<div id="hint">← → / клик / свайп — листать · N — текст доклада · F — fullscreen</div>
+<div id="notes"><div class="ttl">🎤 текст доклада</div><div id="notes-body"></div></div>
 
 <script>
   const slides=[...document.querySelectorAll('.slide')];
@@ -323,14 +392,14 @@
     bar.style.width=(slides.length>1?(i/(slides.length-1)*100):100)+'%';
     counter.textContent=fmt(i)+' / '+fmt(slides.length-1);
     notesBody.innerHTML='<p>'+(slides[i].dataset.notes||'—').replace(/\[(.*?)\]/g,'<span class="pause">[$1]</span>')+'</p>';
-    slides[i].querySelectorAll('.tab,.card').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
+    slides[i].querySelectorAll('.tab,.card,.mech').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
     chainGen++; pipeGen++;            // cancel any in-flight loops on every move
     const cur=slides[i];
     if(cur.querySelector('.chain'))    runChain(cur);
     if(cur.querySelector('.clist'))    cascade(cur);
     if(cur.querySelector('.pipeline')) runPipeline(cur);
     if(cur.querySelector('[data-type]')) typeText(cur);
-    if(cur.querySelector('.count') && !cur.querySelector('.chain')) cur.querySelectorAll('.count').forEach(c=>countUp(c,1100));
+    if(cur.querySelector('.count') && !cur.querySelector('.chain')) cur.querySelectorAll('.count').forEach(c=>countUp(c,1500));
   }
   function go(n){i=Math.max(0,Math.min(slides.length-1,n));render()}
 
@@ -350,12 +419,12 @@
     const chain=slide.querySelector('.chain'); chain.classList.add('seq');
     const kids=[...chain.children]; kids.forEach(k=>k.classList.remove('show'));
     slide.querySelectorAll('.count').forEach(c=>c.textContent='0');
-    await sleep(350); if(!alive())return;
+    await sleep(500); if(!alive())return;
     for(const k of kids){
       if(!alive())return;
       k.classList.add('show');
-      const c=k.querySelector?.('.count'); if(c)countUp(c,1300);
-      await sleep(k.classList.contains('arrow')?520:820);
+      const c=k.querySelector?.('.count'); if(c)countUp(c,1700);
+      await sleep(k.classList.contains('arrow')?720:1100);
     }
   }
   // cascade list rows in + count any stats on the slide
@@ -365,7 +434,7 @@
       wall.classList.add('cascade');
       [...wall.children].forEach((d,k)=>{d.style.animation='none';void d.offsetHeight;d.style.animation='gitin .5s ease '+(0.15+k*0.12).toFixed(2)+'s both'});
     }
-    slide.querySelectorAll('.count').forEach(c=>countUp(c,1100));
+    slide.querySelectorAll('.count').forEach(c=>countUp(c,1500));
   }
   // type out [data-type] text
   function typeText(slide){
@@ -399,7 +468,7 @@
       }
       if(dotEls[n-1])dotEls[n-1].classList.add('full');
       if(feed){const line=document.createElement('div');line.innerHTML='<span class="ok">✓</span> '+(root.dataset.feed||word)+' '+n;feed.prepend(line)}
-      await sleep(450); if(!alive())return;
+      await sleep(650); if(!alive())return;
     }
     if(!alive())return;
     if(counterEl)counterEl.innerHTML='<span class="ok">'+(root.dataset.fin||'Готово ✓')+'</span>';
@@ -415,6 +484,9 @@
     else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
   });
   document.getElementById('deck').addEventListener('click',e=>{go(e.clientX<window.innerWidth*0.25?i-1:i+1)});
+  let tx=null;
+  document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)go(dx<0?i+1:i-1);tx=null},{passive:true});
   render();
 </script>
 </body>
