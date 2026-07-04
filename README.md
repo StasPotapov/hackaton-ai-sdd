@@ -45,13 +45,34 @@
 ## Артефакты подачи (в корне репозитория)
 
 - `PROPOSAL.md` — **заявка** (Project Proposal) по 6 критериям.
-- `presentation/` — питч-материалы: HTML-дека `gigaspec-pitch-deck.html`, нарратив доклада
-  (`story-*.md`) и раскадровка слайдов (`slides-storyboard-*.md`).
+- `presentation/` — питч-материалы и сборка PDF: интерактивная HTML-дека
+  `gigaspec-pitch-deck.html` (навигация `← →` / колесо / клик / свайп, `N` — текст доклада,
+  `F` — fullscreen; на мобильном слайды скроллятся вертикально), нарратив доклада
+  (`story-*.md`), раскадровка слайдов (`slides-storyboard-*.md`) и скрипты сборки PDF (ниже).
 - `email-package/` — готовые PDF для отправки жюри: `GigaSpec-Proposal.pdf` и
-  `GigaSpec-Pitch-Deck.pdf` (статичный 1:1-рендер деки).
+  `GigaSpec-Pitch-Deck.pdf` (статичный 1:1-рендер деки). Собираются скриптами из `presentation/`.
 - `DISCUSSION.md` — открытые вопросы (питч, оргимена, действия до подачи); решения синка —
   в PROPOSAL/этом README, полный протокол — в git-истории.
 - `TEAM.md` — состав команды, роли, контакты, доступы.
+
+### Пересборка PDF (`presentation/`)
+
+Оба PDF в `email-package/` собираются из исходников — `PROPOSAL.md` и HTML-деки — скриптами
+в `presentation/`. Требуются **pandoc**, **Google Chrome** и **Node.js** (puppeteer-core
+подтягивается сам при первом запуске). Путь к Chrome при необходимости — через `CHROME_BIN`.
+
+```bash
+cd presentation
+./build-email-package.sh     # оба PDF разом (npm install — внутри, при необходимости)
+```
+
+Точечно (из `presentation/`):
+
+- `npm run build:proposal` (или `./build-proposal-pdf.sh`) — `GigaSpec-Proposal.pdf` из
+  `PROPOSAL.md`: pandoc → standalone-HTML с зелёной темой `proposal-pdf.css` → Chrome `--print-to-pdf`.
+- `npm run build:deck` (или `node build-deck-pdf.js`) — `GigaSpec-Pitch-Deck.pdf`: puppeteer
+  прогоняет деку, детерминированно добивает анимации до финала (карточки, цепочки, pipeline,
+  счётчики, typed-текст) и печатает постранично 1600×900, заменяя тяжёлый blur-фон векторным.
 
 ## Архив ([archive/](archive/))
 
