@@ -51,14 +51,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   // ДЕТЕРМИНИРОВАННАЯ финализация всего динамического контента (не по таймингу).
   await page.evaluate(() => {
-    // счётчики → конечное значение
-    document.querySelectorAll('.count').forEach(el => { if (el.dataset.to) el.textContent = el.dataset.to; });
-    // печатаемый текст → полный
-    document.querySelectorAll('[data-type]').forEach(el => { if (el.dataset.type) el.textContent = el.dataset.type; });
-    // цепочки → все ноды/стрелки показаны (и подсвечены)
+    // счётчики → конечное значение (el._tok++ гасит активный countUp, иначе
+    // requestAnimationFrame перезапишет наше значение обратно на промежуточное)
+    document.querySelectorAll('.count').forEach(el => { el._tok = (el._tok | 0) + 1; if (el.dataset.to) el.textContent = el.dataset.to; });
+    // печатаемый текст → полный (el._tok++ гасит активный typeText — иначе он
+    // допечатывает свой частичный кадр поверх, обрезая текст на «--ini»)
+    document.querySelectorAll('[data-type]').forEach(el => { el._tok = (el._tok | 0) + 1; if (el.dataset.type) el.textContent = el.dataset.type; });
+    // цепочки → нейтральное состояние (как в HTML): ноды видимы без .seq,
+    // стрелки серые без зелёной glow-подсветки (её даёт .seq/.show — убираем).
     document.querySelectorAll('.chain').forEach(c => {
-      c.classList.add('seq');
-      c.querySelectorAll('.node, .arrow').forEach(k => k.classList.add('show'));
+      c.classList.remove('seq');
+      c.querySelectorAll('.node, .arrow').forEach(k => k.classList.remove('show'));
     });
     // каскадные списки → раскрыты
     document.querySelectorAll('.clist').forEach(c => c.classList.add('cascade'));
@@ -98,6 +101,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     .clist > div, .clist.cascade > div { opacity: 1 !important; transform: none !important; animation: none !important; }
     /* никаких «бегающих» glow-рамок активной стадии на статичной печати */
     .pstage.on { box-shadow: none !important; border-color: var(--line) !important; }
+    /* экранные glow-свечения в статичном PDF застывают в пике и разрастаются
+       в «зелёные пятна» на пол-слайда — гасим их (typed-блок, evolve, стрелки). */
+    .typed { animation: none !important; box-shadow: none !important; }
+    .evolve { animation: none !important; text-shadow: none !important; }
+    .chain .node, .chain .arrow, .chain .big { text-shadow: none !important; box-shadow: none !important; }
+    .tcur { display: none !important; }
     .slide {
       display: flex !important;
       position: relative !important;
